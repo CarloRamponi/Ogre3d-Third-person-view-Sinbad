@@ -35,22 +35,28 @@ Sinbad::Sinbad(Camera *mCamera, SceneManager * mSceneManager, TerrainGroup * mTe
 
 	timer=0.0f;
 	offset = 50;  //Distanza iniziale della telecamera dal personaggio
-	cameraAngle=Degree(90);
+	XAngle=Degree(90);
+	YAngle=Degree(30);
 	scambioOssa=spadeEstratte=isRunning=false;
-	cameraRelativePosition=Vector3(0,5,0);
 
 }
 
 Sinbad::~Sinbad(){}
 
-bool Sinbad::update(const FrameEvent &evt){
+bool Sinbad::update(const FrameEvent &evt, bool backward){
 	for(int i=0; i<9; i++){
 		if(i!=2 && i!=3)
 			animations[i]->addTime(evt.timeSinceLastFrame);
 		else if(isRunning)
-			animations[i]->addTime(evt.timeSinceLastFrame*2);	//raddoppio la velocità dell'animazione
+			if(backward)											//backward è uguale a treu quando sta camminando all'indietro, così inverte l'animazione
+				animations[i]->addTime(-evt.timeSinceLastFrame*2);	//raddoppio la velocità dell'animazione
+			else
+				animations[i]->addTime(evt.timeSinceLastFrame*2);
 		else
-			animations[i]->addTime(evt.timeSinceLastFrame);
+			if(backward)
+				animations[i]->addTime(-evt.timeSinceLastFrame);
+			else
+				animations[i]->addTime(evt.timeSinceLastFrame);
 
 		if(animations[i]->hasEnded() && i!=6) animations[i]->setEnabled(false);
 	}
@@ -86,7 +92,10 @@ bool Sinbad::update(const FrameEvent &evt){
 	node->setPosition(Vector3(node->getPosition().x, HeightFunction::getTerrainHeight(node->getPosition().x, node->getPosition().z, *terrainGroup) + 15, node->getPosition().z));
 
 	//calcolo la pozione relativa al personaggio (come se esso fosse in 0,0,0)
-	cameraRelativePosition=Vector3(cos(cameraAngle.valueDegrees())*offset, cameraRelativePosition.y, sin(cameraAngle.valueDegrees())*offset);
+	cameraRelativePosition.x=cos(YAngle.valueDegrees()) * cos(XAngle.valueDegrees()) * offset;
+	cameraRelativePosition.y=sin(XAngle.valueDegrees()) * offset;
+	cameraRelativePosition.z=sin(YAngle.valueDegrees()) * cos(XAngle.valueDegrees()) * offset;
+
 	//pozione assoluta (posizione del personaggio + posizioneRelativa)
 	camera->setPosition(node->getPosition() + cameraRelativePosition);
 	//controllo che la camera non sia nel terreno, in quel caso la sposto più su
@@ -104,7 +113,7 @@ bool Sinbad::update(const FrameEvent &evt){
 }
 
 void Sinbad::movement(Real speed, Vector3 direction, Real time){
-	if(!isRunning)
+	if(!isRunning) 
 		node->translate(direction * speed * time ,Ogre::Node::TS_LOCAL);
 	else
 		node->translate(direction * speed * 2 * time ,Ogre::Node::TS_LOCAL);
@@ -152,12 +161,10 @@ void Sinbad::mouseMoved(const OIS::MouseEvent &e){
 	float speed = 0.01f;	//sensibilità del mouse
 
 	if(e.state.X.rel)		//cambio l'angolo della telecamera
-		cameraAngle-=Degree(e.state.X.rel * speed);
-
-	float ySpeed = 0.005f; //sensibilità verticale del mouse
+		YAngle-=Degree(e.state.X.rel * speed);
 
 	if(e.state.Y.rel)
-		cameraRelativePosition.y-= e.state.Y.rel * ySpeed * offset; //metto anche offset perchè man mano che la telecamera si allontana il movimento deve essere più veloce
+		XAngle-=Degree(-e.state.Y.rel * speed);
 
 	float zoomSpeed = 0.1f;	//velocità con cui si zoomma sul personaggio
 

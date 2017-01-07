@@ -68,14 +68,14 @@ protected:
 	float timer;
 	bool scambioOssa, spadeEstratte, isRunning;
 	Ogre::Vector3 cameraRelativePosition;
-	Ogre::Degree cameraAngle;
+	Ogre::Degree XAngle, YAngle;
 	unsigned int offset;
 
 public:
 	~Sinbad();
 	Sinbad(Ogre::Camera *mCamera, Ogre::SceneManager * mSceneManager, Ogre::TerrainGroup * mTerrainGroup);
 	bool setCamera(Ogre::Camera * mCamera);
-	bool update(const Ogre::FrameEvent &evt);
+	bool update(const Ogre::FrameEvent &evt, bool backward);
 	void movement(Ogre::Real speed, Ogre::Vector3 direction, Ogre::Real time);
 	void rotation(Ogre::Real speed, Ogre::Real direction, Ogre::Real time);
 	void runStart();

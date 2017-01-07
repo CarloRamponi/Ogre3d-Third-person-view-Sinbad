@@ -259,6 +259,14 @@ bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent &evt)
 	//rotazione
 	sinbad->rotation(rotSpeed, rot, evt.timeSinceLastFrame);
 	
+
+	bool backward;
+
+	if(move.z == -1)
+		backward = true;
+	else
+		backward = false;
+
 	
 	move.normalise();
 	Real speed=40;
@@ -269,7 +277,7 @@ bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent &evt)
 	else
 		sinbad->runStop();
 
-	sinbad->update(evt);
+	sinbad->update(evt, backward);
 
 	return BaseApplication::frameRenderingQueued(evt);
 }
