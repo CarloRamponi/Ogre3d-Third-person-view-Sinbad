@@ -204,36 +204,32 @@ bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent &evt)
 	int rot = 0;
 	bool isMoving = false;
 
-	if(mKeyboard->isKeyDown(OIS::KC_K))   // move forward
+	if(mKeyboard->isKeyDown(OIS::KC_K) || mKeyboard->isKeyDown(OIS::KC_S))   // move forward
 	{
 		isMoving = true;
 		move.z = -1.0f;
 	}
-	if(mKeyboard->isKeyDown(OIS::KC_I))   // move back
+	if(mKeyboard->isKeyDown(OIS::KC_I) || mKeyboard->isKeyDown(OIS::KC_W))   // move back
 	{
 		isMoving = true;
 		move.z = 1.0f;
 	}
-	if(mKeyboard->isKeyDown(OIS::KC_L))   // move left
+	if(mKeyboard->isKeyDown(OIS::KC_L) || mKeyboard->isKeyDown(OIS::KC_D))
 	{
-		isMoving = true;
-		move.x = -1.0f;
+		if(move.z == -1.0f)
+			rot+=1;
+		else
+			rot-=1;
 	}
-	if(mKeyboard->isKeyDown(OIS::KC_J))   // move right
+	if(mKeyboard->isKeyDown(OIS::KC_J) || mKeyboard->isKeyDown(OIS::KC_A))
 	{
-		isMoving = true;
-		move.x = 1.0f;
-	}
-	if(mKeyboard->isKeyDown(OIS::KC_O))
-	{
-		rot-=1;
-	}
-	if(mKeyboard->isKeyDown(OIS::KC_U))
-	{
-		rot+=1;
+		if(move.z == -1.0f)
+			rot-=1;
+		else
+			rot+=1;
 	}
 	
-	if(mKeyboard->isKeyDown(OIS::KC_RSHIFT))
+	if(mKeyboard->isKeyDown(OIS::KC_RSHIFT) || mKeyboard->isKeyDown(OIS::KC_LSHIFT))
 	{
 		sinbad->setRunning(true);
 	}
